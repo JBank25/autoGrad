@@ -7,12 +7,12 @@ using namespace std;
 
 class Value
 {
+public:
     float data;
     vector<Value *> prevValues;
     string op;
     float grad = 0.0;
 
-public:
     /**
      * @brief Construct a new Value object with children AND input_data
      *
@@ -62,35 +62,58 @@ public:
         }
     }
 
-    // Define equality operator for unordered_set
-    bool operator==(const Value &other) const
-    {
-        return data == other.data;
-    }
-
-    Value mult(const Value &other)
+    Value mult(Value &other)
     {
         Value result(this->data * other.data, "*"); // is creating this locally here problematic for its persistence??
         result.prevValues.push_back(const_cast<Value *>(&other));
         result.prevValues.push_back(this);
+        // propogate gradient from 'result' to 'this' and 'other'
+        this->grad = (other.data) * (result.grad);
+        other.grad = (this->data) * (result.grad);
         return result;
     }
 
-    Value add(const Value &other)
+    Value operator+(Value &other)
     {
         Value result(this->data + other.data, "+"); // is creating this locally here problematic for its persistence??
         result.prevValues.push_back(const_cast<Value *>(&other));
         result.prevValues.push_back(this);
+        this->grad = (1.0) * result.grad;
+        other.grad = 1.0 * result.grad;
         return result;
     }
 
+    Value add(Value &other)
+    {
+        Value result(this->data + other.data, "+"); // is creating this locally here problematic for its persistence??
+        result.prevValues.push_back(const_cast<Value *>(&other));
+        result.prevValues.push_back(this);
+        // propogate the gradient from result to 'this' and 'other'
+        this->grad = (1.0) * result.grad;
+        other.grad = 1.0 * result.grad;
+        return result;
+    }
+
+    /**
+     * @brief Creates a new node whose value is tanh(x) where x is the data member
+     * of the node which tanh is being called on
+     *
+     * @return Value new node whose data member is tanh(x) and child is the node in which
+     * tanh was called on.
+     */
     Value tanh()
     {
-        float x = this->data;
-        float tanh_output = ((exp(2 * x) - 1) / ((exp(2 * x)) + 1));
-        Value tanh_val_node = Value(tanh_output, "tanh");
-        tanh_val_node.prevValues.push_back(this);
+        float x = this->data;                                        // grab data from this node to be tanh'd
+        float tanh_output = ((exp(2 * x) - 1) / ((exp(2 * x)) + 1)); // tanh the data
+        Value tanh_val_node = Value(tanh_output, "tanh");            // create new node
+        tanh_val_node.prevValues.push_back(this);                    // 'this' node should be its only prevValue
+        // gradient for 'this' is deriv of tanh, CHAIN RULE STILL HERE!
+        this->grad = (1 - exp2(tanh_output)) * tanh_val_node.grad;
         return tanh_val_node;
+    }
+
+    Value Backwards_add()
+    {
     }
 };
 
