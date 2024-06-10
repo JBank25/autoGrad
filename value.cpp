@@ -69,19 +69,12 @@ public:
         Value result(this->data * other.data, "*"); // is creating this locally here problematic for its persistence??
         result.prevValues.push_back(const_cast<Value *>(&other));
         result.prevValues.push_back(this);
-        this->grad = (other.data) * (result.grad);
-        other.grad = (this->data) * (result.grad);
-        return result;
-    }
-
-    Value mult(Value &other)
-    {
-        Value result(this->data * other.data, "*"); // is creating this locally here problematic for its persistence??
-        result.prevValues.push_back(const_cast<Value *>(&other));
-        result.prevValues.push_back(this);
-        // propogate gradient from 'result' to 'this' and 'other'
-        this->grad = (other.data) * (result.grad);
-        other.grad = (this->data) * (result.grad);
+        // Define the lambda function
+        result.backward = [&other, this, &result]()
+        {
+            this->grad = (other.data) * (result.grad);
+            other.grad = (this->data) * (result.grad);
+        };
         return result;
     }
 
@@ -99,17 +92,6 @@ public:
         return result;
     }
 
-    Value add(Value &other)
-    {
-        Value result(this->data + other.data, "+"); // is creating this locally here problematic for its persistence??
-        result.prevValues.push_back(const_cast<Value *>(&other));
-        result.prevValues.push_back(this);
-        // propogate the gradient from result to 'this' and 'other'
-        this->grad = (1.0) * result.grad;
-        other.grad = 1.0 * result.grad;
-        return result;
-    }
-
     /**
      * @brief Creates a new node whose value is tanh(x) where x is the data member
      * of the node which tanh is being called on
@@ -123,24 +105,17 @@ public:
         float tanh_output = ((exp(2 * x) - 1) / ((exp(2 * x)) + 1)); // tanh the data
         Value tanh_val_node = Value(tanh_output, "tanh");            // create new node
         tanh_val_node.prevValues.push_back(this);                    // 'this' node should be its only prevValue
-        // gradient for 'this' is deriv of tanh, CHAIN RULE STILL HERE!
-        this->grad = (1 - exp2(tanh_output)) * tanh_val_node.grad;
+                                                                     // Define the lambda function
+        this->backward = [&tanh_val_node, this, tanh_output]()
+        {
+            // gradient for 'this' is deriv of tanh, CHAIN RULE STILL HERE!
+            this->grad = (1 - exp2(tanh_output)) * tanh_val_node.grad;
+        };
         return tanh_val_node;
-    }
-
-    Value Backwards_add()
-    {
     }
 };
 
 int main()
 {
     Value valA(2.0);
-    Value valB(-3.0);
-    Value valC(10.0);
-    Value valE = (valA.mult(valB));
-    Value valD = valE.add(valC);
-    Value valF(-2.0);
-    Value valL = valD.mult(valF);
-    valL.printValue();
 }
