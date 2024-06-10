@@ -62,6 +62,16 @@ public:
         }
     }
 
+    Value operator*(Value &other)
+    {
+        Value result(this->data * other.data, "*"); // is creating this locally here problematic for its persistence??
+        result.prevValues.push_back(const_cast<Value *>(&other));
+        result.prevValues.push_back(this);
+        this->grad = (other.data) * (result.grad);
+        other.grad = (this->data) * (result.grad);
+        return result;
+    }
+
     Value mult(Value &other)
     {
         Value result(this->data * other.data, "*"); // is creating this locally here problematic for its persistence??
