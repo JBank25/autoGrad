@@ -1,4 +1,5 @@
 #include <cmath>
+#include <functional>
 #include <iostream>
 #include <unordered_set>
 #include <vector>
@@ -12,6 +13,7 @@ public:
     vector<Value *> prevValues;
     string op;
     float grad = 0.0;
+    std::function<void()> backward; // Lambda to update gradients
 
     /**
      * @brief Construct a new Value object with children AND input_data
@@ -88,8 +90,12 @@ public:
         Value result(this->data + other.data, "+"); // is creating this locally here problematic for its persistence??
         result.prevValues.push_back(const_cast<Value *>(&other));
         result.prevValues.push_back(this);
-        this->grad = (1.0) * result.grad;
-        other.grad = 1.0 * result.grad;
+        // Define the lambda function
+        result.backward = [&other, this, &result]()
+        {
+            this->grad = 1.0 * result.grad;
+            other.grad = 1.0 * result.grad;
+        };
         return result;
     }
 
