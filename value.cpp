@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cmath>
 #include <functional>
 #include <iostream>
@@ -12,8 +13,8 @@ public:
     float data;
     vector<Value *> prevValues;
     string op;
-    float grad = 0.0;
-    std::function<void()> backward; // Lambda to update gradients
+    float grad = 1.0;
+    std::function<void()> _backward; // Lambda to update gradients
 
     /**
      * @brief Construct a new Value object with children AND input_data
@@ -70,7 +71,7 @@ public:
         result.prevValues.push_back(const_cast<Value *>(&other));
         result.prevValues.push_back(this);
         // Define the lambda function
-        result.backward = [&other, this, &result]()
+        result._backward = [&other, this, &result]()
         {
             this->grad = (other.data) * (result.grad);
             other.grad = (this->data) * (result.grad);
@@ -84,7 +85,7 @@ public:
         result.prevValues.push_back(const_cast<Value *>(&other));
         result.prevValues.push_back(this);
         // Define the lambda function
-        result.backward = [&other, this, &result]()
+        result._backward = [&other, this, &result]()
         {
             this->grad = 1.0 * result.grad;
             other.grad = 1.0 * result.grad;
@@ -106,16 +107,44 @@ public:
         Value tanh_val_node = Value(tanh_output, "tanh");            // create new node
         tanh_val_node.prevValues.push_back(this);                    // 'this' node should be its only prevValue
                                                                      // Define the lambda function
-        this->backward = [&tanh_val_node, this, tanh_output]()
+        this->_backward = [&tanh_val_node, this, tanh_output]()
         {
             // gradient for 'this' is deriv of tanh, CHAIN RULE STILL HERE!
             this->grad = (1 - exp2(tanh_output)) * tanh_val_node.grad;
         };
         return tanh_val_node;
     }
+
+    void backward()
+    {
+        std::unordered_set<Value *> visited;
+        vector<Value *> topoSort;
+
+        std::function<void(Value *)> dfs = [&](Value *v)
+        {
+            if (visited.find(v) != visited.end())
+                return;
+            visited.insert(v);
+            for (Value *child : v->prevValues)
+            {
+                dfs(child);
+            }
+            topoSort.push_back(v);
+        };
+
+        dfs(this);
+    }
 };
 
 int main()
 {
-    Value valA(2.0);
+    Value valA(.5);
+    Value valB(1.0);
+    Value valC = valA * valB;
+    valC._backward();
+    Value valD = valB.tanh();
+
+    valD.backward();
+
+    std::cout << valD.data << std::endl;
 }
