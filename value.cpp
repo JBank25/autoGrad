@@ -13,6 +13,7 @@ public:
     float data;
     vector<Value *> prevValues;
     string op;
+    string label;
     float grad = 1.0;
     std::function<void()> _backward; // Lambda to update gradients
 
@@ -39,6 +40,13 @@ public:
      *
      * @param input_data - initialize Value object with input_data
      */
+    Value(float input_data, string valLabel) : data(input_data), label(valLabel) {}
+
+    /**
+     * @brief Construct a new Value object with input_data
+     *
+     * @param input_data - initialize Value object with input_data
+     */
     Value(float input_data) : data(input_data) {}
 
     /**
@@ -46,7 +54,7 @@ public:
      *
      * @param input_data - initialize Value object with input_data
      */
-    Value(float input_data, string op) : data(input_data), op(op) {}
+    Value(float input_data, string op, string valLabel) : data(input_data), op(op), label(valLabel) {}
 
     /**
      * @brief Print the data member of Value obj. I miss python
@@ -119,6 +127,7 @@ public:
     {
         std::unordered_set<Value *> visited;
         vector<Value *> topoSort;
+        topoSort.clear(); // Clear the vector before each call to the function
 
         std::function<void(Value *)> dfs = [&](Value *v)
         {
@@ -133,18 +142,31 @@ public:
         };
 
         dfs(this);
+
+        for (unsigned int i = 0; i < topoSort.size(); i++)
+        {
+            std::cout << topoSort[i]->label << " Data:" << topoSort[i]->data << std::endl;
+        }
     }
 };
 
 int main()
 {
-    Value valA(.5);
-    Value valB(1.0);
-    Value valC = valA * valB;
-    valC._backward();
-    Value valD = valB.tanh();
+    Value valA(1.0, "a");
+    Value valB(0, "b");
+    Value valC(2.0, "c");
+    Value valD(-3.0, "d");
+    Value valE = valA * valB;
+    valE.label = "e";
+    Value valF = valC * valD;
+    valF.label = "f";
+    Value valG = valF + valE;
+    valG.label = "g";
 
-    valD.backward();
-
-    std::cout << valD.data << std::endl;
+    Value valH(6.8815, "h");
+    Value valI = valH + valG;
+    valI.label = "i";
+    Value valJ = valI.tanh();
+    valJ.label = "j";
+    valJ.backward();
 }
