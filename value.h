@@ -1,5 +1,4 @@
-#ifndef VALUE_H
-#define VALUE_H
+#pragma once
 
 #include <algorithm>
 #include <cmath>
@@ -32,5 +31,3 @@ public:
     Value tanh();
     void backward();
 };
-
-#endif // VALUE_H

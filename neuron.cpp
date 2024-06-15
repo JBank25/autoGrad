@@ -18,12 +18,3 @@ Neuron::Neuron(int numInputs)
     }
     bias = Value(distribution(generator));
 }
-int main()
-{
-    // Value testVal = Value(1.0);
-    Neuron testNeuron = Neuron(10);
-    for (int i = 0; i < 10; i++)
-    {
-        std::cout << testNeuron.weights[i].data << std::endl;
-    }
-}
