@@ -25,6 +25,7 @@ public:
     Value(float input_data, string valLabel);
     Value(float input_data);
     Value(float input_data, string op, string valLabel);
+    Value(){}; // Default constructor
 
     Value operator*(Value &other);
     Value operator+(Value &other);
