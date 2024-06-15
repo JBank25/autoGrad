@@ -7,7 +7,6 @@
 #include <vector>
 
 using namespace std;
-#include "value.h"
 
 Value::Value(float input_data, const vector<Value *> &children, string op)
     : data(input_data), prevValues(children), op(op) {}
