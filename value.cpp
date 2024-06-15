@@ -15,7 +15,7 @@ public:
     string op;
     string label;
     float grad = 1.0;
-    std::function<void()> _backward; // Lambda to update gradients
+    std::function<void()> _backward = nullptr; // Lambda to update gradients
 
     /**
      * @brief Construct a new Value object with children AND input_data
@@ -78,11 +78,13 @@ public:
         Value result(this->data * other.data, "*"); // is creating this locally here problematic for its persistence??
         result.prevValues.push_back(const_cast<Value *>(&other));
         result.prevValues.push_back(this);
+        result.grad = .77;
         // Define the lambda function
         result._backward = [&other, this, &result]()
         {
-            this->grad = (other.data) * (result.grad);
-            other.grad = (this->data) * (result.grad);
+            this->grad += (other.data) * (result.grad);
+            other.grad += (this->data) * (result.grad);
+            // std::cout << "Label: " << result.label << " Mul grad" << std::endl;
         };
         return result;
     }
@@ -92,11 +94,13 @@ public:
         Value result(this->data + other.data, "+"); // is creating this locally here problematic for its persistence??
         result.prevValues.push_back(const_cast<Value *>(&other));
         result.prevValues.push_back(this);
+
         // Define the lambda function
         result._backward = [&other, this, &result]()
         {
-            this->grad = 1.0 * result.grad;
-            other.grad = 1.0 * result.grad;
+            this->grad += 1.0 * result.grad;
+            other.grad += 1.0 * result.grad;
+            // std::cout << "Label: " << this->label << "Add grad" << std::endl;
         };
         return result;
     }
@@ -115,11 +119,13 @@ public:
         Value tanh_val_node = Value(tanh_output, "tanh");            // create new node
         tanh_val_node.prevValues.push_back(this);                    // 'this' node should be its only prevValue
                                                                      // Define the lambda function
-        this->_backward = [&tanh_val_node, this, tanh_output]()
+        tanh_val_node._backward = [&tanh_val_node, this, tanh_output]()
         {
             // gradient for 'this' is deriv of tanh, CHAIN RULE STILL HERE!
-            this->grad = (1 - exp2(tanh_output)) * tanh_val_node.grad;
+            this->grad += (1 - (tanh_output) * (tanh_output)) * tanh_val_node.grad;
+            // std::cout << "Tanh grad label: " << this->label << std::endl;
         };
+        this->_backward();
         return tanh_val_node;
     }
 
@@ -143,22 +149,30 @@ public:
 
         dfs(this);
 
-        for (unsigned int i = 0; i < topoSort.size(); i++)
+        for (int i = topoSort.size() - 1; i >= 0; i--)
         {
-            std::cout << topoSort[i]->label << " Data:" << topoSort[i]->data << std::endl;
+            // std::cout << topoSort[i]->label << " Data:" << topoSort[i]->data << std::endl;
+            if (topoSort[i]->_backward != nullptr)
+            {
+                topoSort[i]->_backward();
+            }
+        }
+        for (int i = topoSort.size() - 1; i >= 0; i--)
+        {
+            std::cout << topoSort[i]->label << " grad: " << topoSort[i]->grad << std::endl;
         }
     }
 };
 
 int main()
 {
-    Value valA(1.0, "a");
-    Value valB(0, "b");
-    Value valC(2.0, "c");
-    Value valD(-3.0, "d");
+    Value valA(2.0, "a");
+    Value valB(-3.0, "b");
+    Value valC(0.0, "c");
+    Value valD(1.0, "d");
     Value valE = valA * valB;
     valE.label = "e";
-    Value valF = valC * valD;
+    Value valF = valD * valC;
     valF.label = "f";
     Value valG = valF + valE;
     valG.label = "g";
@@ -168,5 +182,9 @@ int main()
     valI.label = "i";
     Value valJ = valI.tanh();
     valJ.label = "j";
+    valJ.grad = 1;
     valJ.backward();
+    // valE._backward();
+    // std::cout << valA.grad << std::endl;
+    // std::cout << valB.grad << std::endl;
 }
