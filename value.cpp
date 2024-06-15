@@ -14,7 +14,7 @@ public:
     vector<Value *> prevValues;
     string op;
     string label;
-    float grad = 1.0;
+    float grad = 0.0;
     std::function<void()> _backward = nullptr; // Lambda to update gradients
 
     /**
@@ -24,16 +24,6 @@ public:
      */
     Value(float input_data, const vector<Value *> &children, string op)
         : data(input_data), prevValues(children), op(op) {}
-
-    /**
-     * @brief Get the data field
-     *
-     * @return float
-     */
-    float getData(void)
-    {
-        return data;
-    }
 
     /**
      * @brief Construct a new Value object with input_data
@@ -56,29 +46,12 @@ public:
      */
     Value(float input_data, string op, string valLabel) : data(input_data), op(op), label(valLabel) {}
 
-    /**
-     * @brief Print the data member of Value obj. I miss python
-     *
-     */
-    void printValue(void)
-    {
-        std::cout << "**Value Obj***\n"
-                  << data << std::endl;
-        std::cout << "Value data: " << data << std::endl;
-        std::cout << "Value op: " << op << std::endl;
-        std::cout << "Num Input Value Nodes: " << prevValues.size() << std::endl;
-        for (unsigned int i = 0; i < prevValues.size(); i++)
-        {
-            prevValues[i]->printValue();
-        }
-    }
-
     Value operator*(Value &other)
     {
+        // TODO: Add support for something like valObj * 2
         Value result(this->data * other.data, "*"); // is creating this locally here problematic for its persistence??
         result.prevValues.push_back(const_cast<Value *>(&other));
         result.prevValues.push_back(this);
-        result.grad = .77;
         // Define the lambda function
         result._backward = [&other, this, &result]()
         {
@@ -91,6 +64,7 @@ public:
 
     Value operator+(Value &other)
     {
+        // TODO: Add support for something like valObj * 2
         Value result(this->data + other.data, "+"); // is creating this locally here problematic for its persistence??
         result.prevValues.push_back(const_cast<Value *>(&other));
         result.prevValues.push_back(this);
