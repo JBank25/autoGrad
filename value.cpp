@@ -19,6 +19,10 @@ Value::Value(float input_data, string op, string valLabel) : data(input_data), o
 
 Value Value::operator*(Value &other)
 {
+    if (typeid(other) != typeid(Value))
+    {
+        other = Value(other);
+    }
     Value result(this->data * other.data, "*");
     result.prevValues.push_back(const_cast<Value *>(&other));
     result.prevValues.push_back(this);
@@ -32,6 +36,10 @@ Value Value::operator*(Value &other)
 
 Value Value::operator+(Value &other)
 {
+    if (typeid(other) != typeid(Value))
+    {
+        other = Value(other);
+    }
     Value result(this->data + other.data, "+");
     result.prevValues.push_back(const_cast<Value *>(&other));
     result.prevValues.push_back(this);
@@ -53,7 +61,10 @@ Value Value::tanh()
     {
         this->grad += (1 - (tanh_output) * (tanh_output)) * tanh_val_node.grad;
     };
-    this->_backward();
+    if (this->_backward != nullptr)
+    {
+        this->_backward();
+    }
     return tanh_val_node;
 }
 

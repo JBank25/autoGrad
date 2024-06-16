@@ -11,6 +11,8 @@ public:
     int numInputs;
     vector<Value> weights;
     Value bias = NULL;
-
+    
+    Neuron() = default; // Default constructor
     Neuron(int numInputs);
+    Value operator()(vector<float> neuronInput);
 };
