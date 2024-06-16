@@ -16,6 +16,8 @@ int main()
 
     std::cout << testNeuron.bias.data << std::endl;
     vector<float> testData = {1.0, 50.0};
-    Value outNeuron = testNeuron(testData);
-    std::cout << outNeuron.data << std::endl;
+    Layer testLayer(2, 3);
+    vector<Value> layerOutNeurons = testLayer({1.0, 1.0});
+    std::cout << "Test Layer Neurons: " << testLayer.neuronLayer[0].bias.data << testLayer.neuronLayer[0].weights[0].data << std::endl;
+    // std::cout << testLayer.neuronLayer[0].<< std::endl;
 }

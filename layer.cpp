@@ -14,3 +14,14 @@ Layer::Layer(unsigned int inputsPerNeuron, unsigned int numNeuronsInLayer)
         neuronLayer[i] = newNeuron;
     }
 }
+
+// Type Neuron::functionName(PARAMETERS)
+vector<Value> Layer::operator()(vector<float> layerInput)
+{
+    vector<Value> layerOut(layerInput.size());
+    for (unsigned int i = 0; i < layerInput.size(); i++)
+    {
+        layerOut[i] = neuronLayer[i]({layerInput[i]});
+    }
+    return layerOut;
+}

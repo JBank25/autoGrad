@@ -3,8 +3,9 @@
 #include <functional>
 #include <iostream>
 #include <unordered_set>
-#include "value.h"
 #include <vector>
+
+#include "value.h"
 
 using namespace std;
 
@@ -40,11 +41,14 @@ Value Value::operator+(Value &other)
     {
         other = Value(other);
     }
-    Value result(this->data + other.data, "+");
-    result.prevValues.push_back(const_cast<Value *>(&other));
+    Value result(this->data + other.data, "+");               // create new Value using operands to '+'
+    result.prevValues.push_back(const_cast<Value *>(&other)); // add operands to '+' to prevValues list
     result.prevValues.push_back(this);
+
+    // set our backwards function now
     result._backward = [&other, this, &result]()
     {
+        // for addition, grad just flows backwards
         this->grad += 1.0 * result.grad;
         other.grad += 1.0 * result.grad;
     };
@@ -61,10 +65,7 @@ Value Value::tanh()
     {
         this->grad += (1 - (tanh_output) * (tanh_output)) * tanh_val_node.grad;
     };
-    if (this->_backward != nullptr)
-    {
-        this->_backward();
-    }
+
     return tanh_val_node;
 }
 
