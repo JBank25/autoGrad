@@ -5,15 +5,15 @@
 
 Layer::Layer(unsigned int inputsPerNeuron, unsigned int numNeuronsInLayer)
 {
-    inputsPerNeuron = inputsPerNeuron;
-    numNeuronsInLayer = numNeuronsInLayer;
+    this->inputsPerNeuron = inputsPerNeuron;
+    this->numNeuronsInLayer = numNeuronsInLayer;
     // resize our vector holding the neurons in this layer
-    neuronLayer.resize(numNeuronsInLayer);
+    this->neuronLayer.resize(numNeuronsInLayer);
     for (unsigned int i = 0; i < numNeuronsInLayer; i++)
     {
         // create new neuron with given num of inputs
         Neuron newNeuron(inputsPerNeuron);
-        neuronLayer[i] = newNeuron;
+        this->neuronLayer[i] = newNeuron;
     }
 }
 
@@ -23,7 +23,7 @@ vector<Value> Layer::operator()(vector<float> layerInput)
     vector<Value> layerOut(layerInput.size());
     for (unsigned int i = 0; i < layerInput.size(); i++)
     {
-        layerOut[i] = neuronLayer[i](layerInput);
+        // layerOut[i] = neuronLayer[i]({layerInput[i]});
     }
     return layerOut;
 }

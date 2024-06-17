@@ -11,8 +11,10 @@ public:
     int numInputs;
     vector<Value> weights;
     Value bias = NULL;
-    
+    Value sumValue;
+
     Neuron() = default; // Default constructor
     Neuron(int numInputs);
     Value operator()(vector<float> neuronInput);
+    Value operator()(vector<Value> neuronInput);
 };
