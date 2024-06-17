@@ -47,19 +47,21 @@ Value Neuron::operator()(vector<Value> neuronInput)
     assert(neuronInput.size() == this->numInputs);
     float runningSum = this->bias.data;
     float activation = 0;
-    vector<Value *> allOperationsInNeuron(neuronInput.size() + 1);
-    Value holdVal;
-    Value sumVal(0);
-    Value tanHVal;
+    vector<std::shared_ptr<Value>> allOperationsInNeuron(neuronInput.size() + 1);
+    std::shared_ptr<Value> sumVal = std::make_shared<Value>(0);
+    std::shared_ptr<Value> holdVal;
+
     for (unsigned int i = 0; i < this->numInputs; i++)
     {
-        holdVal = (neuronInput[i] * this->weights[i]);
-        allOperationsInNeuron[i] = &holdVal;
-        sumVal = holdVal + sumVal;
+        holdVal = std::make_shared<Value>(neuronInput[i] * this->weights[i]);
+        allOperationsInNeuron[i] = holdVal;
+        *sumVal = *holdVal + *sumVal;
     }
 
-    tanHVal = sumVal.tanh();
-    // Value sumNeuron = Value(runningSum);
-    // Value activationNeuron = sumNeuron.tanh();
-    return tanHVal;
+    std::shared_ptr<Value> tanHVal = std::make_shared<Value>(sumVal->tanh());
+
+    // Add sumVal to prevValues of tanHVal
+    tanHVal->prevValues.push_back(sumVal.get());
+
+    return *tanHVal;
 }
