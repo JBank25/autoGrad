@@ -12,7 +12,7 @@ public:
     float data;
     vector<Value *> prevValues;
     string op;
-    string label;
+    string label = "";
     float grad = 0.0;
     std::function<void()> _backward = nullptr; // Lambda to update gradients
 
