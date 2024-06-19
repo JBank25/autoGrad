@@ -17,4 +17,5 @@ public:
     Neuron(int numInputs);
     Value operator()(vector<float> neuronInput);
     Value operator()(vector<Value> neuronInput);
+    void backward();
 };
