@@ -25,6 +25,7 @@ public:
 
     Value operator*(Value &other);
     Value operator+(Value &other);
+    Value exp(int power);
     Value tanh();
     void backward();
 };

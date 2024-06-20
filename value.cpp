@@ -69,6 +69,18 @@ Value Value::tanh()
     return tanh_val_node;
 }
 
+Value Value::exp(int power)
+{
+    Value out = (Value(pow(this->data, power), "pow"));
+
+    out._backward = [&out, this, power]()
+    {
+        this->grad += (power * pow(this->data, (power - 1))) * out.grad;
+    };
+
+    return out;
+}
+
 void Value::backward()
 {
     vector<Value> visited;
