@@ -16,6 +16,7 @@ public:
     float grad = 0.0;
     std::function<void()> _backward = nullptr; // Lambda to update gradients
 
+    // TODO: constructor cleanup
     Value(float input_data, const vector<Value *> &children, string op);
     Value(float input_data, string valLabel);
     Value(float input_data);

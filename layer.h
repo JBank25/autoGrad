@@ -12,5 +12,5 @@ public:
     vector<Neuron> neuronLayer;
 
     Layer(unsigned int inputsPerNeuron, unsigned int numNeuronsInLayer);
-    vector<Value> operator()(vector<float> layerInput);
+    vector<Value> operator()(vector<Value> layerInput);
 };

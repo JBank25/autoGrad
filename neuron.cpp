@@ -27,21 +27,6 @@ Neuron::Neuron(int numInputsToNeuron)
     this->bias = Value(distribution(generator));
 }
 
-// Type Neuron::functionName(PARAMETERS)
-Value Neuron::operator()(vector<float> neuronInput)
-{
-    assert(neuronInput.size() == this->numInputs);
-    float runningSum = this->bias.data;
-    float activation = 0;
-    for (unsigned int i = 0; i < this->numInputs; i++)
-    {
-        runningSum += (neuronInput[i] * this->weights[i].data);
-    }
-    Value sumNeuron = Value(runningSum);
-    Value activationNeuron = sumNeuron.tanh();
-    return activationNeuron;
-}
-
 Value Neuron::operator()(vector<Value> neuronInput)
 {
     assert(neuronInput.size() == this->numInputs);
