@@ -30,11 +30,11 @@ Neuron::Neuron(int numInputsToNeuron)
 std::shared_ptr<Value> Neuron::operator()(std::vector<Value> neuronInput)
 {
     assert(neuronInput.size() == this->numInputs);
-    float runningSum = this->bias;
+    float runningSum = this->bias.data;
     float activation = 0;
 
     auto sumVal = std::make_shared<Value>(0.0f);
-    std::shared_ptr<Value> holdVal;
+    std::shared_ptr<Value> holdVal = std::make_shared<Value>(this->bias);
     std::shared_ptr<Value> sumHold;
 
     for (unsigned int i = 0; i < this->numInputs; i++)

@@ -18,14 +18,15 @@ Layer::Layer(unsigned int inputsPerNeuron, unsigned int numNeuronsInLayer)
 }
 
 // Type Neuron::functionName(PARAMETERS)
-vector<Value> Layer::operator()(vector<Value> layerInput)
+std::vector<std::shared_ptr<Value>> Layer::operator()(vector<Value> layerInput)
 {
-    vector<Value> layerOut(this->numNeuronsInLayer);
-
+    std::vector<std::shared_ptr<Value>> layerOut(this->numNeuronsInLayer);
     // Input vector should be called on every neuron
     for (int i = 0; i < this->numNeuronsInLayer; i++)
     {
-        layerOut[i] = this->neuronLayer[i](layerInput);
+        Neuron thisNeuron = this->neuronLayer[i];
+
+        layerOut[i] = thisNeuron(layerInput);
     }
     return layerOut;
 }

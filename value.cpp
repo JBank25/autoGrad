@@ -20,8 +20,8 @@ Value::Value(float input_data, string op, string valLabel) : data(input_data), o
 Value Value::operator*(Value &other)
 {
     Value result(this->data * other.data, "*");
-    result.prevValues.push_back(this);
-    result.prevValues.push_back(&other);
+    result.prevValues.push_back(std::make_shared<Value>(*this));
+    result.prevValues.push_back(std::make_shared<Value>(other));
     result._backward = [&]()
     {
         this->grad += other.data * result.grad;
@@ -33,8 +33,8 @@ Value Value::operator*(Value &other)
 Value Value::operator+(Value &other)
 {
     Value result(this->data + other.data, "+");
-    result.prevValues.push_back(this);
-    result.prevValues.push_back(&other);
+    result.prevValues.push_back(std::make_shared<Value>(*this));
+    result.prevValues.push_back(std::make_shared<Value>(other));
     result._backward = [&]()
     {
         this->grad += result.grad;
@@ -48,7 +48,7 @@ Value Value::tanh()
     float x = this->data;
     float tanh_output = std::tanh(x);
     Value tanh_val_node = Value(tanh_output, "tanh");
-    tanh_val_node.prevValues.push_back(this);
+    tanh_val_node.prevValues.push_back(std::make_shared<Value>(*this));
     tanh_val_node._backward = [this, tanh_output, &tanh_val_node]()
     {
         this->grad += (1 - tanh_output * tanh_output) * tanh_val_node.grad;
@@ -59,7 +59,7 @@ Value Value::tanh()
 Value Value::power(int power)
 {
     Value out = Value(std::pow(this->data, power), "pow");
-    out.prevValues.push_back(this);
+    out.prevValues.push_back(std::make_shared<Value>(*this));
     out._backward = [this, power, &out]()
     {
         this->grad += power * std::pow(this->data, power - 1) * out.grad;
@@ -69,26 +69,24 @@ Value Value::power(int power)
 
 void Value::backward()
 {
-    vector<Value *> visited;
-    vector<Value *> topoSort;
+    std::vector<std::shared_ptr<Value>> visited;
+    std::vector<std::shared_ptr<Value>> topoSort;
 
-    function<void(Value *)> dfs = [&](Value *v)
+    std::function<void(std::shared_ptr<Value>)> dfs = [&](std::shared_ptr<Value> v)
     {
         if (!v)
             return;
-        if (find(visited.begin(), visited.end(), v) != visited.end())
-            return;
-        if (v->prevValues.size() == 0)
+        if (std::find(visited.begin(), visited.end(), v) != visited.end())
             return;
         visited.push_back(v);
-        for (Value *child : v->prevValues)
+        for (std::shared_ptr<Value> child : v->prevValues)
         {
             dfs(child);
         }
         topoSort.push_back(v);
     };
 
-    dfs(this);
+    dfs(std::make_shared<Value>(*this));
 
     for (int i = topoSort.size() - 1; i >= 0; i--)
     {

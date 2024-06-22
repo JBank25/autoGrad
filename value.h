@@ -10,7 +10,7 @@ class Value
 {
 public:
     float data;
-    vector<Value *> prevValues;
+    std::vector<std::shared_ptr<Value>> prevValues;
     string op;
     string label = "";
     float grad = 0.0;
