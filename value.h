@@ -10,7 +10,7 @@ class Value
 {
 public:
     float data;
-    vector<Value> prevValues;
+    vector<Value *> prevValues;
     string op;
     string label = "";
     float grad = 0.0;
@@ -25,7 +25,7 @@ public:
 
     Value operator*(Value &other);
     Value operator+(Value &other);
-    Value exp(int power);
+    Value power(int power);
     Value tanh();
     void backward();
 };

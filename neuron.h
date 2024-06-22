@@ -15,6 +15,6 @@ public:
 
     Neuron() = default; // Default constructor
     Neuron(int numInputs);
-    Value operator()(vector<Value> neuronInput);
+    std::shared_ptr<Value> operator()(std::vector<Value> neuronInput);
     void backward();
 };

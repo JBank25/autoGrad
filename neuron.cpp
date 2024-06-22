@@ -27,25 +27,27 @@ Neuron::Neuron(int numInputsToNeuron)
     this->bias = Value(distribution(generator));
 }
 
-Value Neuron::operator()(vector<Value> neuronInput)
+std::shared_ptr<Value> Neuron::operator()(std::vector<Value> neuronInput)
 {
     assert(neuronInput.size() == this->numInputs);
-    float runningSum = this->bias.data;
+    float runningSum = this->bias;
     float activation = 0;
-    Value sumVal = Value(0);
-    Value holdVal;
-    Value sumHold;
+
+    auto sumVal = std::make_shared<Value>(0.0f);
+    std::shared_ptr<Value> holdVal;
+    std::shared_ptr<Value> sumHold;
+
     for (unsigned int i = 0; i < this->numInputs; i++)
     {
-        holdVal = (neuronInput[i] * this->weights[i]);
-        sumHold = (sumVal + holdVal);
+        holdVal = std::make_shared<Value>(neuronInput[i] * this->weights[i]);
+        sumHold = std::make_shared<Value>(*sumVal + *holdVal);
         sumVal = sumHold;
     }
 
-    Value tanHVal = (sumVal.tanh());
+    auto tanHVal = std::make_shared<Value>(sumVal->tanh());
 
     // Add sumVal to prevValues of tanHVal
-    // tanHVal.prevValues.push_back(sumVal);
+    tanHVal->prevValues.push_back(sumVal);
 
     return tanHVal;
 }

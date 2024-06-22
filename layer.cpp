@@ -20,7 +20,7 @@ Layer::Layer(unsigned int inputsPerNeuron, unsigned int numNeuronsInLayer)
 // Type Neuron::functionName(PARAMETERS)
 vector<Value> Layer::operator()(vector<Value> layerInput)
 {
-    vector<Value> layerOut(layerInput.size());
+    vector<Value> layerOut(this->numNeuronsInLayer);
 
     // Input vector should be called on every neuron
     for (int i = 0; i < this->numNeuronsInLayer; i++)
