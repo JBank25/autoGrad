@@ -30,6 +30,19 @@ Value Value::operator*(Value &other)
     return result;
 }
 
+Value Value::operator*(shared_ptr<Value> &other)
+{
+    Value result(this->data * other->data, "*");
+    result.prevValues.push_back(std::make_shared<Value>(*this));
+    result.prevValues.push_back(other);
+    result._backward = [&]()
+    {
+        this->grad += other->data * result.grad;
+        other->grad += this->data * result.grad;
+    };
+    return result;
+}
+
 Value Value::operator+(Value &other)
 {
     Value result(this->data + other.data, "+");
