@@ -9,8 +9,6 @@
 
 using namespace std;
 
-// Value::Value(float input_data, const vector<Value *> &children, string op)
-//     : data(input_data), prevValues(children), op(op) {}
 Value::Value(float input_data, string valLabel) : data(input_data), label(valLabel), grad(0.0) {}
 
 Value::Value(float input_data) : data(input_data), grad(0.0) {}

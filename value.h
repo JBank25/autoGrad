@@ -17,11 +17,10 @@ public:
     bool _backward = false;
 
     // TODO: constructor cleanup
-    Value(float input_data, const vector<Value *> &children, string op);
     Value(float input_data, string valLabel);
     Value(float input_data);
     Value(float input_data, string op, string valLabel);
-    Value(){}; // Default constructor
+    Value() = default; // Default constructor
 
     Value operator*(Value &other);
     Value operator*(shared_ptr<Value> &other);

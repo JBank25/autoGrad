@@ -8,10 +8,7 @@
 
 using namespace std;
 
-// Use (void) to silence unused warnings.
-#define assertm(exp, msg) assert(((void)msg, exp))
-
-Neuron::Neuron(int numInputsToNeuron)
+Neuron::Neuron(unsigned int numInputsToNeuron)
 {
     // neuron will generally get fed output from every neuron in prev layer
     this->numInputs = numInputsToNeuron;
