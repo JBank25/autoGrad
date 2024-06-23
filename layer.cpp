@@ -32,15 +32,15 @@ std::vector<std::shared_ptr<Value>> Layer::operator()(vector<Value> layerInput)
 }
 
 // Type Neuron::functionName(PARAMETERS)
-// std::vector<std::shared_ptr<Value>> Layer::operator()(vector<shared_ptr<Value>> layerInput)
-// {
-//     std::vector<std::shared_ptr<Value>> layerOut(this->numNeuronsInLayer);
-//     // Input vector should be called on every neuron
-//     for (int i = 0; i < this->numNeuronsInLayer; i++)
-//     {
-//         Neuron thisNeuron = this->neuronLayer[i];
+std::vector<std::shared_ptr<Value>> Layer::operator()(vector<shared_ptr<Value>> layerInput)
+{
+    std::vector<std::shared_ptr<Value>> layerOut(this->numNeuronsInLayer);
+    // Input vector should be called on every neuron
+    for (int i = 0; i < this->numNeuronsInLayer; i++)
+    {
+        Neuron thisNeuron = this->neuronLayer[i];
 
-//         layerOut[i] = thisNeuron(layerInput);
-//     }
-//     return layerOut;
-// }
+        layerOut[i] = thisNeuron(layerInput);
+    }
+    return layerOut;
+}

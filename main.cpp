@@ -67,30 +67,39 @@ void testLayer()
     testLayerOutput[1]->prevValues[0]->backward();
     testLayerOutput[1]->prevValues[1]->backward();
 
+    std::vector<std::shared_ptr<Value>> moreTestInput = {make_shared<Value>(testValA), make_shared<Value>(testValB)};
+    testLayerOutput = testLayer(moreTestInput);
+
+    testLayerOutput[0]->prevValues[0]->backward();
+    testLayerOutput[0]->prevValues[1]->backward();
+
+    testLayerOutput[1]->prevValues[0]->backward();
+    testLayerOutput[1]->prevValues[1]->backward();
+
     return;
 }
 
 void testDummyModel()
 {
-    int inputsPerNeuron = 2;
-    int neuronsInLayer = 2;
-    Value testValA(-1, "A");
-    Value testValB(2, "B");
+    int inputsPerNeuron = 1;
+    int neuronsInLayer = 1;
+    Value testValA(2, "A");
     Layer testLayer(inputsPerNeuron, neuronsInLayer);
-    std::vector<std::shared_ptr<Value>> testLayerOutput = testLayer({testValA, testValB});
+    std::vector<std::shared_ptr<Value>> testLayerOutput = testLayer({testValA});
 
-    int inputsInOutputLayer = 2;
+    int inputsInOutputLayer = 1;
     int numNeuronsInOutputLayer = 1;
     Layer outputLayer(inputsInOutputLayer, numNeuronsInOutputLayer);
-    vector<Value> hold = {*testLayerOutput[0], *testLayerOutput[1]};
-    std::vector<std::shared_ptr<Value>> output = outputLayer(hold);
+    std::vector<std::shared_ptr<Value>> output = outputLayer(testLayerOutput);
     output[0]->grad = .33;
+    output[0]->backward();
     return;
 }
 
 int main()
 {
-    testValue();
-    testNeuron();
-    testLayer();
+    // testValue();
+    // testNeuron();
+    // testLayer();
+    testDummyModel();
 }

@@ -33,7 +33,7 @@ std::shared_ptr<Value> Neuron::operator()(std::vector<Value> neuronInput)
     float runningSum = this->bias.data;
     float activation = 0;
 
-    auto sumVal = std::make_shared<Value>(0.0f);
+    auto sumVal = ::make_shared<Value>(0.0f);
     std::shared_ptr<Value> holdVal = std::make_shared<Value>(this->bias);
     std::shared_ptr<Value> sumHold;
 
@@ -64,7 +64,7 @@ std::shared_ptr<Value> Neuron::operator()(std::vector<shared_ptr<Value>> neuronI
 
     for (unsigned int i = 0; i < this->numInputs; i++)
     {
-        holdVal = std::make_shared<Value>(this->weights[i] * neuronInput[i]);
+        holdVal = std::make_shared<Value>(*neuronInput[i] * this->weights[i]);
         sumHold = std::make_shared<Value>(*sumVal + *holdVal);
         sumVal = sumHold;
     }

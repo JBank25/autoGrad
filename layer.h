@@ -13,4 +13,5 @@ public:
 
     Layer(unsigned int inputsPerNeuron, unsigned int numNeuronsInLayer);
     std::vector<std::shared_ptr<Value>> operator()(vector<Value> layerInput);
+    std::vector<std::shared_ptr<Value>> operator()(vector<shared_ptr<Value>> layerInput);
 };
