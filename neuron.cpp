@@ -33,8 +33,8 @@ std::shared_ptr<Value> Neuron::operator()(std::vector<Value> neuronInput)
     float runningSum = this->bias.data;
     float activation = 0;
 
-    auto sumVal = ::make_shared<Value>(0.0f);
-    std::shared_ptr<Value> holdVal = std::make_shared<Value>(this->bias);
+    auto sumVal = std::make_shared<Value>(this->bias);
+    std::shared_ptr<Value> holdVal;
     std::shared_ptr<Value> sumHold;
 
     for (unsigned int i = 0; i < this->numInputs; i++)
@@ -44,10 +44,12 @@ std::shared_ptr<Value> Neuron::operator()(std::vector<Value> neuronInput)
         sumVal = sumHold;
     }
 
+    // TODO: I DONT NEED to push sumVal as a prevValues on tanHVal right????
+    // That is being handled in tanh isnt it???
     auto tanHVal = std::make_shared<Value>(sumVal->tanh());
 
     // Add sumVal to prevValues of tanHVal
-    tanHVal->prevValues.push_back(sumVal);
+    // tanHVal->prevValues.push_back(sumVal);
 
     return tanHVal;
 }
