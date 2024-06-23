@@ -17,5 +17,4 @@ public:
     Neuron(int numInputs);
     std::shared_ptr<Value> operator()(std::vector<Value> neuronInput);
     std::shared_ptr<Value> operator()(std::vector<shared_ptr<Value>> neuronInput);
-    void backward();
 };

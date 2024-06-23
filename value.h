@@ -14,7 +14,7 @@ public:
     string op;
     string label = "";
     float grad = 0.0;
-    std::function<void()> _backward = nullptr; // Lambda to update gradients
+    bool _backward = false;
 
     // TODO: constructor cleanup
     Value(float input_data, const vector<Value *> &children, string op);
@@ -29,5 +29,6 @@ public:
     Value operator-(Value &other);
     Value power(int power);
     Value tanh();
+    void backwards();
     void backward();
 };
