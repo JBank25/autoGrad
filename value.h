@@ -26,6 +26,7 @@ public:
     Value operator*(Value &other);
     Value operator*(shared_ptr<Value> &other);
     Value operator+(Value &other);
+    Value operator-(Value &other);
     Value power(int power);
     Value tanh();
     void backward();

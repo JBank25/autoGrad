@@ -56,6 +56,19 @@ Value Value::operator+(Value &other)
     return result;
 }
 
+Value Value::operator-(Value &other)
+{
+    Value result(this->data - other.data, "-");
+    result.prevValues.push_back(std::make_shared<Value>(*this));
+    result.prevValues.push_back(std::make_shared<Value>(other));
+    result._backward = [&]()
+    {
+        this->grad += result.grad;
+        other.grad -= result.grad;
+    };
+    return result;
+}
+
 Value Value::tanh()
 {
     float x = this->data;
