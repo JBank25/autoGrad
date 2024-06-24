@@ -1,13 +1,25 @@
 #include <algorithm>
+#include <cassert>
 #include <cmath>
 #include <functional>
 #include <iostream>
 #include <unordered_set>
 #include <vector>
 
+#include "utility.h"
 #include "value.h"
 
 using namespace std;
+
+#define ASSERT_FMT(condition, format, ...)                                    \
+    do                                                                        \
+    {                                                                         \
+        if (!(condition))                                                     \
+        {                                                                     \
+            fprintf(stderr, "Assertion failed: " format "\n", ##__VA_ARGS__); \
+            assert(condition);                                                \
+        }                                                                     \
+    } while (0)
 
 Value::Value(float input_data, string valLabel) : data(input_data), label(valLabel), grad(0.0) {}
 
@@ -19,27 +31,38 @@ void Value::backward()
 {
     if (this->label == "+")
     {
-        shared_ptr<Value> prevVal1 = this->prevValues[0];
-        shared_ptr<Value> prevVal2 = this->prevValues[1];
+        ASSERT_FMT(this->prevValues.size() == 2, "Too few prevValues in + backprop");
+        ASSERT_FMT(this->prevValues[0] != nullptr, "Null ptr in prevValues[0] in + backprop");
+        ASSERT_FMT(this->prevValues[1] != nullptr, "Null ptr in prevValues[1] in + backprop");
+        shared_ptr<Value> prevVal0 = this->prevValues[0];
+        shared_ptr<Value> prevVal1 = this->prevValues[1];
+        prevVal0->grad += this->grad;
         prevVal1->grad += this->grad;
-        prevVal2->grad += this->grad;
     }
     else if (this->label == "-")
     {
-        shared_ptr<Value> prevVal1 = this->prevValues[0];
-        shared_ptr<Value> prevVal2 = this->prevValues[1];
-        prevVal1->grad += this->grad;
-        prevVal2->grad -= this->grad;
+        ASSERT_FMT(this->prevValues.size() == 2, "Too few prevValues in - backprop");
+        ASSERT_FMT(this->prevValues[0] != nullptr, "Null ptr in prevValues[0] in - backprop");
+        ASSERT_FMT(this->prevValues[1] != nullptr, "Null ptr in prevValues[1] in - backprop");
+        shared_ptr<Value> prevVal0 = this->prevValues[0];
+        shared_ptr<Value> prevVal1 = this->prevValues[1];
+        prevVal0->grad += this->grad;
+        prevVal1->grad -= this->grad;
     }
     else if (this->label == "*")
     {
-        shared_ptr<Value> prevVal1 = this->prevValues[0];
-        shared_ptr<Value> prevVal2 = this->prevValues[1];
-        prevVal1->grad += prevVal2->data * this->grad;
-        prevVal2->grad += prevVal1->data * this->grad;
+        ASSERT_FMT(this->prevValues.size() == 2, "Too few prevValues in * backprop");
+        ASSERT_FMT(this->prevValues[0] != nullptr, "Null ptr in prevValues[0] in * backprop");
+        ASSERT_FMT(this->prevValues[1] != nullptr, "Null ptr in prevValues[1] in * backprop");
+        shared_ptr<Value> prevVal0 = this->prevValues[0];
+        shared_ptr<Value> prevVal1 = this->prevValues[1];
+        prevVal0->grad += prevVal1->data * this->grad;
+        prevVal1->grad += prevVal0->data * this->grad;
     }
     else if (this->label == "tanh")
     {
+        ASSERT_FMT(this->prevValues.size() == 1, "Too few prevValues in tanh backprop");
+        ASSERT_FMT(this->prevValues[0] != nullptr, "Null ptr in prevValues[0] in tanh backprop");
         shared_ptr<Value> prevVal = this->prevValues[0];
         prevVal->grad = (1 - (this->data * this->data)) * this->grad;
     }

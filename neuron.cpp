@@ -26,7 +26,7 @@ Neuron::Neuron(unsigned int numInputsToNeuron)
 
 std::shared_ptr<Value> Neuron::operator()(std::vector<Value> neuronInput)
 {
-    assert(neuronInput.size() == this->numInputs);
+    assert(("Too few prevValues in * backprop", neuronInput.size() == this->numInputs));
 
     auto sumVal = std::make_shared<Value>(this->bias);
     std::shared_ptr<Value> holdVal;
