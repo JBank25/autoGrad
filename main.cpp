@@ -92,7 +92,7 @@ void testDummyModel()
     Layer outputLayer(inputsInOutputLayer, numNeuronsInOutputLayer);
     std::vector<std::shared_ptr<Value>> output = outputLayer(testLayerOutput);
     output[0]->grad = .33;
-    output[0]->backward();
+    output[0]->backwards();
     return;
 }
 

@@ -8,10 +8,7 @@
 
 using namespace std;
 
-// Use (void) to silence unused warnings.
-#define assertm(exp, msg) assert(((void)msg, exp))
-
-Neuron::Neuron(int numInputsToNeuron)
+Neuron::Neuron(unsigned int numInputsToNeuron)
 {
     // neuron will generally get fed output from every neuron in prev layer
     this->numInputs = numInputsToNeuron;
@@ -21,17 +18,15 @@ Neuron::Neuron(int numInputsToNeuron)
     for (unsigned int i = 0; i < numInputsToNeuron; i++)
     {
         // will need one for every input we have
-        this->weights[i] = Value(distribution(generator));
+        this->weights[i] = Value(distribution(generator), "w");
     }
     // single bias for the neuron
-    this->bias = Value(distribution(generator));
+    this->bias = Value(distribution(generator), "b");
 }
 
 std::shared_ptr<Value> Neuron::operator()(std::vector<Value> neuronInput)
 {
     assert(neuronInput.size() == this->numInputs);
-    float runningSum = this->bias.data;
-    float activation = 0;
 
     auto sumVal = std::make_shared<Value>(this->bias);
     std::shared_ptr<Value> holdVal;
@@ -48,20 +43,15 @@ std::shared_ptr<Value> Neuron::operator()(std::vector<Value> neuronInput)
     // That is being handled in tanh isnt it???
     auto tanHVal = std::make_shared<Value>(sumVal->tanh());
 
-    // Add sumVal to prevValues of tanHVal
-    // tanHVal->prevValues.push_back(sumVal);
-
     return tanHVal;
 }
 
 std::shared_ptr<Value> Neuron::operator()(std::vector<shared_ptr<Value>> neuronInput)
 {
     assert(neuronInput.size() == this->numInputs);
-    float runningSum = this->bias.data;
-    float activation = 0;
 
-    auto sumVal = std::make_shared<Value>(0.0f);
-    std::shared_ptr<Value> holdVal = std::make_shared<Value>(this->bias);
+    auto sumVal = std::make_shared<Value>(this->bias);
+    std::shared_ptr<Value> holdVal;
     std::shared_ptr<Value> sumHold;
 
     for (unsigned int i = 0; i < this->numInputs; i++)
@@ -71,17 +61,9 @@ std::shared_ptr<Value> Neuron::operator()(std::vector<shared_ptr<Value>> neuronI
         sumVal = sumHold;
     }
 
+    // TODO: I DONT NEED to push sumVal as a prevValues on tanHVal right????
+    // That is being handled in tanh isnt it???
     auto tanHVal = std::make_shared<Value>(sumVal->tanh());
 
-    // Add sumVal to prevValues of tanHVal
-    tanHVal->prevValues.push_back(sumVal);
-
     return tanHVal;
-}
-void Neuron::backward()
-{
-    for (int i = 0; i < this->numInputs + 1; i++)
-    {
-        return;
-    }
 }

@@ -14,14 +14,13 @@ public:
     string op;
     string label = "";
     float grad = 0.0;
-    std::function<void()> _backward = nullptr; // Lambda to update gradients
+    bool _backward = false;
 
     // TODO: constructor cleanup
-    Value(float input_data, const vector<Value *> &children, string op);
     Value(float input_data, string valLabel);
     Value(float input_data);
     Value(float input_data, string op, string valLabel);
-    Value(){}; // Default constructor
+    Value() = default; // Default constructor
 
     Value operator*(Value &other);
     Value operator*(shared_ptr<Value> &other);
@@ -29,5 +28,6 @@ public:
     Value operator-(Value &other);
     Value power(int power);
     Value tanh();
+    void backwards();
     void backward();
 };
