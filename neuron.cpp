@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "neuron.h"
+#include "utility.h"
 #include "value.h"
 
 using namespace std;
@@ -26,7 +27,7 @@ Neuron::Neuron(unsigned int numInputsToNeuron)
 
 std::shared_ptr<Value> Neuron::operator()(std::vector<Value> neuronInput)
 {
-    assert(("Too few prevValues in * backprop", neuronInput.size() == this->numInputs));
+    ASSERT_FMT(neuronInput.size() == this->numInputs, "Input size to neuron != # of inputs neuron accepts");
 
     auto sumVal = std::make_shared<Value>(this->bias);
     std::shared_ptr<Value> holdVal;
@@ -48,7 +49,7 @@ std::shared_ptr<Value> Neuron::operator()(std::vector<Value> neuronInput)
 
 std::shared_ptr<Value> Neuron::operator()(std::vector<shared_ptr<Value>> neuronInput)
 {
-    assert(neuronInput.size() == this->numInputs);
+    ASSERT_FMT(neuronInput.size() == this->numInputs, "Input size to neuron != # of inputs neuron accepts");
 
     auto sumVal = std::make_shared<Value>(this->bias);
     std::shared_ptr<Value> holdVal;

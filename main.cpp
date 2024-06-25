@@ -81,16 +81,26 @@ void testLayer()
 
 void testDummyModel()
 {
-    int inputsPerNeuron = 1;
-    int neuronsInLayer = 1;
+    int inputsPerNeuron = 3;
+    int neuronsInLayer = 3;
     Value testValA(2, "A");
+    Value testValB(1.2, "B");
+    Value testValC(-2.1, "C");
     Layer testLayer(inputsPerNeuron, neuronsInLayer);
-    std::vector<std::shared_ptr<Value>> testLayerOutput = testLayer({testValA});
+    std::vector<std::shared_ptr<Value>> testLayerOutput = testLayer({testValA, testValB, testValC});
 
-    int inputsInOutputLayer = 1;
-    int numNeuronsInOutputLayer = 1;
-    Layer outputLayer(inputsInOutputLayer, numNeuronsInOutputLayer);
-    std::vector<std::shared_ptr<Value>> output = outputLayer(testLayerOutput);
+    int inputsInHiddenLayer = 3;
+    int numNeuronsInHiddenLayer = 3;
+    Layer hiddenLayer(inputsInHiddenLayer, numNeuronsInHiddenLayer);
+    std::vector<std::shared_ptr<Value>> outputHidden = hiddenLayer(testLayerOutput);
+
+    Layer hiddenLayer2(inputsInHiddenLayer, numNeuronsInHiddenLayer);
+    std::vector<std::shared_ptr<Value>> outputHidden2 = hiddenLayer2(outputHidden);
+
+    int inputsInOutputLayer = outputHidden.size();
+    int neuronsInOutputLayer = 1;
+    Layer outputLayer(inputsInOutputLayer, neuronsInOutputLayer);
+    std::vector<std::shared_ptr<Value>> output = outputLayer(outputHidden2);
     output[0]->grad = .33;
     output[0]->backwards();
     return;
